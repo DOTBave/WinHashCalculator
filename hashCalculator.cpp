@@ -2,8 +2,18 @@
 #include <string>
 #include <memory>
 #include <cstdio>
-#include <cstdlib>
 #include <array>
+
+#ifdef _WIN32
+    #define POPEN _popen
+    #define PCLOSE _pclose
+    std::string encryptions[7] = { "MD2", "MD4", "MD5", "SHA1", "SHA256", "SHA384", "SHA512"};
+#else
+    #define POPEN popen
+    #define PCLOSE pclose
+    std::string encryptions[7] = { "md2", "md4", "md5", "sha1", "sha256", "sha384", "sha512"};
+#endif
+
 
 void clearStream() {
     while (std::cin.get() != '\n');
@@ -21,14 +31,17 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    std::string encryptions[7] = { "MD2", "MD4", "MD5", "SHA1", "SHA256", "SHA384", "SHA512"};
     // forms the file path
     std::string filePath = std::string(argv[1]);
 
     // add quotes around filePath (if there weren't already)
     if (!filePath.empty()) {
         if (filePath[0] != '"') {
-            filePath = '"' + filePath + '"';
+            #ifdef _WIN32
+                filePath = '"' + filePath + '"';
+            #else
+                filePath = '\'' + filePath + '\'';
+            #endif
         }
     }
     else {
@@ -37,13 +50,17 @@ int main(int argc, char* argv[]) {
     }
 
     // forming command
-    std::string command = "certutil -hashfile " + filePath + " " + encryptions[getHash()-1];
+    #ifdef _WIN32
+        std::string command = "certutil -hashfile " + filePath + " " + encryptions[getHash()-1];
+    #else
+        std::string command = "openssl dgst -" + encryptions[getHash()-1] + " " + filePath;
+    #endif
     std::cout << "command: " << command << std::endl;
 
     std::array<char, 128> buffer;
     std::string result;
 
-    std::unique_ptr<FILE, decltype(&_pclose)> pipe(_popen(command.c_str(), "r"), _pclose);
+    std::unique_ptr<FILE, int(*)(FILE*)> pipe(POPEN(command.c_str(), "r"), PCLOSE);
 
     if (!pipe) {
         std::cerr << "Error: Command failed to execute" << std::endl;

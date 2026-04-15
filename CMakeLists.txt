@@ -3,4 +3,4 @@ project(WinHashCalc)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(WinHashCalc main.cpp)
+add_executable(WinHashCalc hashCalculator.cpp)

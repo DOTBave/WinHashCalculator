@@ -12,13 +12,23 @@ A very simple, light weight, cross-platform CLI tool that simplifies file hashin
 * **macOS/Linux:** `openssl` is required (it is usually already installed on macOS and Linux)
 
 ## Usage
-Run the program from the terminal by passing a file path, or drag a file onto the program:
+Run the program from the terminal by dragging the file onto the program (Windows), or by calling it in command line:
 
+Windows:
+```bash
+Hashcalculator [path_to_file]
+```
+macOS:
 ```bash
 ./HashCalculator [path_to_file]
+```
 
 Once launched, follow the on-screen prompt to select your desired hashing algorithm:
 
 Legacy: MD2, MD4, MD5
 
 Secure: SHA1, SHA256, SHA384, SHA512
+
+---
+
+Note: This program is a wrapper and does not perform the hashing calculations internally.
